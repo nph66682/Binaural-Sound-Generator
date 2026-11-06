@@ -78,8 +78,8 @@ button { font-family: inherit; }
 .plot canvas { display: block; width: 100%; height: 100%; }
 .head { position: absolute; left: 0; top: 2px; bottom: 2px; width: 2px; background: var(--muted); will-change: transform; transform: translate3d(0, 0, 0); }
 
-.tabs { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
-.tab { font: 600 0.92rem var(--font-display); color: var(--muted); background: transparent; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 12px 4px; min-height: 48px; cursor: pointer; }
+.tabs { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line); }
+.tab { font: 600 0.84rem var(--font-display); color: var(--muted); background: transparent; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 12px 1px; min-height: 48px; cursor: pointer; }
 .tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
 .tab:focus-visible { outline: 2px solid var(--left); outline-offset: -2px; }
 
@@ -120,6 +120,26 @@ input[type="range"]:focus-visible { outline: 2px solid var(--fg); outline-offset
 .empty, .small { color: var(--muted); font-size: 0.86rem; margin: 0; }
 .rampbox { display: flex; gap: 14px; flex-wrap: wrap; align-items: baseline; }
 .rampbox .num { gap: 8px; }
+
+.noframe { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.step { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 12px 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.step[aria-current="true"] { border-color: var(--left); }
+.step-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.step-act { display: flex; gap: 6px; }
+.sbtn { font: 500 1rem var(--font-mono); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 8px; width: 40px; height: 40px; cursor: pointer; }
+.sbtn:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.sbtn[disabled] { opacity: 0.35; cursor: default; }
+.step-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.sf { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.sf span { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sf input { width: 100%; min-width: 0; background: transparent; color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 9px 8px; min-height: 44px; font: 500 1rem var(--font-mono); font-variant-numeric: tabular-nums; }
+.sf input:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.sf small { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+fieldset[disabled] .step { opacity: 0.6; }
+fieldset[disabled] .chip, fieldset[disabled] .addbtn { opacity: 0.5; cursor: default; }
+.banner { border: 1px solid var(--left); border-radius: 10px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: 0.86rem; }
+.banner p { margin: 0; flex: 1 1 14rem; }
 
 .card { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 14px; display: flex; flex-direction: column; gap: 6px; }
 .card .sum { font-family: var(--font-mono); font-size: 0.82rem; color: var(--fg); margin: 0; overflow-wrap: anywhere; }
@@ -183,11 +203,16 @@ input[type="range"]:focus-visible { outline: 2px solid var(--fg); outline-offset
     <button type="button" class="tab" role="tab" id="tab-son" data-tab="son" aria-controls="panel-son" aria-selected="true">Son</button>
     <button type="button" class="tab" role="tab" id="tab-fond" data-tab="fond" aria-controls="panel-fond" aria-selected="false" tabindex="-1">Fond</button>
     <button type="button" class="tab" role="tab" id="tab-seance" data-tab="seance" aria-controls="panel-seance" aria-selected="false" tabindex="-1">Séance</button>
+    <button type="button" class="tab" role="tab" id="tab-prog" data-tab="prog" aria-controls="panel-prog" aria-selected="false" tabindex="-1">Programme</button>
     <button type="button" class="tab" role="tab" id="tab-export" data-tab="export" aria-controls="panel-export" aria-selected="false" tabindex="-1">Export</button>
   </div>
 
   <!-- ============ Son ============ -->
   <section class="panel" role="tabpanel" id="panel-son" aria-labelledby="tab-son">
+    <div class="banner" id="progBanner" hidden>
+      <p>Le programme est activé : porteuse et battement viennent de l'onglet Programme.</p>
+      <button type="button" class="chip act" id="progOffBtn">Désactiver</button>
+    </div>
     <div class="ctl">
       <span class="label">Scénarios</span>
       <div class="chips" id="scen">
@@ -292,6 +317,7 @@ input[type="range"]:focus-visible { outline: 2px solid var(--fg); outline-offset
 
   <!-- ============ Séance ============ -->
   <section class="panel" role="tabpanel" id="panel-seance" aria-labelledby="tab-seance" hidden>
+    <p class="small" id="seanceNote" hidden>Le programme est activé : il remplace le minuteur et la descente progressive.</p>
     <div class="ctl">
       <span class="t" id="timerLabel">Minuteur</span>
       <div class="chips" role="group" aria-labelledby="timerLabel" id="timers">
@@ -316,6 +342,48 @@ input[type="range"]:focus-visible { outline: 2px solid var(--fg); outline-offset
     </div>
   </section>
 
+  <!-- ============ Programme ============ -->
+  <section class="panel" role="tabpanel" id="panel-prog" aria-labelledby="tab-prog" hidden>
+    <fieldset class="noframe" id="progEdit">
+      <div class="ctl">
+        <span class="t" id="progOnLabel">Programme</span>
+        <div class="chips" role="group" aria-labelledby="progOnLabel" id="progOnWrap">
+          <button type="button" class="chip" data-on="0" aria-pressed="true">Désactivé</button>
+          <button type="button" class="chip" data-on="1" aria-pressed="false">Activé</button>
+        </div>
+        <p class="small">Enchaîne plusieurs étapes, chacune avec sa porteuse, son battement et sa durée. Quand il est activé, le bouton Lancer joue tout le programme, du début à la fin.</p>
+      </div>
+
+      <div class="ctl">
+        <ul class="steps" id="progList"></ul>
+        <p class="empty" id="progEmpty">Aucune étape. Ajoute-en une ou pars d'un modèle.</p>
+        <button type="button" class="addbtn" id="progAdd">Ajouter une étape</button>
+        <div class="chips" id="progTpl">
+          <button type="button" class="chip act" data-t="down">+ Endormissement</button>
+          <button type="button" class="chip act" data-t="up">+ Réveil</button>
+        </div>
+        <p class="small">Un modèle s'ajoute à la fin de ta liste, rien n'est effacé.</p>
+      </div>
+
+      <div class="ctl">
+        <span class="t" id="glideLabel">Transition entre étapes</span>
+        <div class="chips" role="group" aria-labelledby="glideLabel" id="progGlide">
+          <button type="button" class="chip" data-g="0" aria-pressed="false">Instantanée</button>
+          <button type="button" class="chip" data-g="5" aria-pressed="false">5 s</button>
+          <button type="button" class="chip" data-g="10" aria-pressed="true">10 s</button>
+          <button type="button" class="chip" data-g="30" aria-pressed="false">30 s</button>
+          <button type="button" class="chip" data-g="60" aria-pressed="false">60 s</button>
+        </div>
+        <p class="small">Au début de chaque étape, la fréquence glisse en douceur depuis la précédente (au maximum la moitié de la durée de l'étape).</p>
+      </div>
+
+      <div class="card">
+        <span class="label">Durée totale</span>
+        <p class="sum" id="progTotal"></p>
+      </div>
+    </fieldset>
+  </section>
+
   <!-- ============ Export ============ -->
   <section class="panel" role="tabpanel" id="panel-export" aria-labelledby="tab-export" hidden>
     <div class="card">
@@ -323,7 +391,8 @@ input[type="range"]:focus-visible { outline: 2px solid var(--fg); outline-offset
       <p class="sum" id="expSummary"></p>
     </div>
 
-    <div class="ctl">
+    <p class="small" id="expProgNote" hidden></p>
+    <div class="ctl" id="expDurCtl">
       <div class="ctl-top">
         <label for="expMin">Durée</label>
         <span class="num"><input id="expMin" type="number" inputmode="decimal" min="0.1" max="180" step="any" value="10" aria-label="Durée en minutes"> min</span>
@@ -509,9 +578,11 @@ var OggOpus = (function () {
 
   var DEF = { mode: 'bin', beat: 4.5, carrier: 256, split: 'sym', shape: 'sine', depth: 100,
     volTone: 40, volBg: 60, volNoise: 25, noise: 'none', loop: 'all', timer: 0,
-    rampOn: false, rampTo: 2, rampMin: 20, expMin: 10, expFmt: 'opus' };
+    rampOn: false, rampTo: 2, rampMin: 20, expMin: 10, expFmt: 'opus',
+    prog: [], progOn: false, glide: 10 };
   var state = {};
   for (var k in DEF) state[k] = DEF[k];
+  state.prog = [];
   try {
     var saved = JSON.parse(localStorage.getItem('bb-state-v3') || localStorage.getItem('bb-state-v2') || 'null');
     if (saved) for (var key in DEF) if (key in saved && typeof saved[key] === typeof DEF[key]) state[key] = saved[key];
@@ -535,6 +606,19 @@ var OggOpus = (function () {
   state.depth = clamp(Math.round(state.depth), 10, 100);
   state.expMin = clamp(state.expMin, 0.1, 180);
   if (state.expFmt !== 'opus' && state.expFmt !== 'wav') state.expFmt = 'opus';
+  state.prog = sanitizeProg(state.prog);
+  if ([0, 5, 10, 30, 60].indexOf(state.glide) < 0) state.glide = 10;
+  function sanitizeProg(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr.slice(0, 30).map(function (s) {
+      s = s || {};
+      return {
+        c: clamp(Math.round(Number(s.c) || 256), 60, 1000),
+        b: clamp(r1(Number(s.b) || 4.5), 0.5, 40),
+        m: clamp(Math.round((Number(s.m) || 10) * 10) / 10, 0.1, 240)
+      };
+    });
+  }
 
   var opusOK = false;
   var A = { ctx: null, sess: null, noiseGain: null };
@@ -550,18 +634,48 @@ var OggOpus = (function () {
   function gBg() { return Math.pow(state.volBg / 100, 2); }
   function gNoise() { return Math.pow(state.volNoise / 100, 2) * 0.6; }
 
+  /* Programme : suite d'étapes {c: porteuse, b: battement, m: minutes}, avec glissement au début de chaque étape. */
+  var runProg = null, runGlide = 10, ctxT0 = 0, progSig = '', lastStep = -1;
+  function progTotal(steps) { var s = 0; for (var i = 0; i < steps.length; i++) s += steps[i].m * 60; return s; }
+  function progAt(e, steps, glide) {
+    var S0 = 0, n = steps.length, i, d = 0;
+    if (e < 0) e = 0;
+    for (i = 0; i < n; i++) {
+      d = steps[i].m * 60;
+      if (e < S0 + d || i === n - 1) break;
+      S0 += d;
+    }
+    var st = steps[i], c = st.c, b = st.b;
+    if (i > 0) {
+      var g = Math.min(glide, d * 0.5), into = e - S0;
+      if (g > 0.01 && into < g) {
+        var p = into / g, pv = steps[i - 1];
+        c = pv.c + (st.c - pv.c) * p; b = pv.b + (st.b - pv.b) * p;
+      }
+    }
+    return { i: i, c: c, b: b };
+  }
+  function progActive() { return state.progOn && state.prog.length > 0; }
+  function progNow() {
+    if (runProg) return progAt(A.ctx ? A.ctx.currentTime - ctxT0 : 0, runProg, runGlide);
+    if (progActive()) return progAt(0, state.prog, state.glide);
+    return null;
+  }
   function beatNow() {
+    var pn = progNow();
+    if (pn) return r2(pn.b);
     if (playing && state.rampOn) {
       var p = clamp((Date.now() - t0) / (state.rampMin * 60000), 0, 1);
       return r2(rampFrom + (state.rampTo - rampFrom) * p);
     }
     return state.beat;
   }
+  function carrierNow() { var pn = progNow(); return pn ? r2(pn.c) : state.carrier; }
   function splitOn() { return state.mode !== 'iso'; }
   function pulseOn() { return state.mode !== 'bin'; }
-  function freqs(b) {
+  function freqs(b, c) {
     if (b === undefined) b = beatNow();
-    var c = state.carrier;
+    if (c === undefined) c = carrierNow();
     if (!splitOn()) return [c, c];
     if (state.split === 'sym') return [Math.max(1, c - b / 2), c + b / 2];
     return [c, c + b];
@@ -664,8 +778,38 @@ var OggOpus = (function () {
     oscL.start(); oscR.start(); lfo.start();
     S = { oscL: oscL, oscR: oscR, lfo: lfo, shaper: shaper, pulse: pulse, toneMaster: toneMaster };
   }
+  /* Planifie d'avance toutes les transitions du programme sur l'horloge audio :
+     elles ne dépendent plus du thread principal (donc pas de saccades au défilement). */
+  function scheduleProgram() {
+    if (!S || !runProg) return;
+    progSig = state.mode + '|' + state.split;
+    var ctx = A.ctx, now = ctx.currentTime, e = now - ctxT0;
+    var params = [S.oscL.frequency, S.oscR.frequency, S.lfo.frequency];
+    function vals(st) { var ff = freqs(st.b, st.c); return [ff[0], ff[1], st.b]; }
+    var cur = progAt(e, runProg, runGlide), cv = vals(cur), k;
+    for (k = 0; k < 3; k++) { params[k].cancelScheduledValues(now); params[k].setValueAtTime(cv[k], now); }
+    var S0 = 0;
+    for (var i = 0; i < runProg.length; i++) {
+      var d = runProg[i].m * 60;
+      if (i > 0) {
+        var g = Math.min(runGlide, d * 0.5), tStart = ctxT0 + S0, tEnd = tStart + g;
+        var prev = vals(runProg[i - 1]), next = vals(runProg[i]);
+        if (g <= 0.01) {
+          if (tStart > now) for (k = 0; k < 3; k++) params[k].setValueAtTime(next[k], tStart);
+        } else if (tEnd > now) {
+          if (tStart > now) for (k = 0; k < 3; k++) params[k].setValueAtTime(prev[k], tStart);
+          for (k = 0; k < 3; k++) params[k].linearRampToValueAtTime(next[k], tEnd);
+        }
+      }
+      S0 += d;
+    }
+  }
   function applyBeat() {
     if (!S) return;
+    if (runProg) {
+      if (progSig !== state.mode + '|' + state.split) scheduleProgram();
+      return;
+    }
     var b = beatNow(), f = freqs(b), t = A.ctx.currentTime;
     S.oscL.frequency.setTargetAtTime(f[0], t, 0.08);
     S.oscR.frequency.setTargetAtTime(f[1], t, 0.08);
@@ -702,15 +846,21 @@ var OggOpus = (function () {
 
   async function start() {
     if (expRunning) return;
+    if (state.progOn && !state.prog.length) { setStatus("Ajoute d'abord une étape dans l'onglet Programme."); return; }
     var ctx = ensureCtx();
     if (!ctx) { setStatus("Ce navigateur ne sait pas produire de son. Essaie Chrome."); return; }
     if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
     try { if (ctx.state !== 'running') await ctx.resume(); } catch (e) {}
     playing = true; fadingOut = false;
+    runProg = progActive() ? state.prog.map(function (s) { return { c: s.c, b: s.b, m: s.m }; }) : null;
+    runGlide = state.glide; lastStep = -1;
+    ctxT0 = ctx.currentTime;
     t0 = Date.now(); rampFrom = state.beat; phase = 0; lastFrame = 0;
-    endAt = state.timer > 0 ? Date.now() + state.timer * 60000 : 0;
+    endAt = (!runProg && state.timer > 0) ? Date.now() + state.timer * 60000 : 0;
     A.noiseGain.gain.value = gNoise();
     startTones();
+    if (runProg) scheduleProgram();
+    updateProgLock();
     applyNoise();
     bgFade = 0; applyBgVol();
     startBg();
@@ -739,6 +889,8 @@ var OggOpus = (function () {
     playing = false;
     clearInterval(tick); tick = null;
     endAt = 0; fadingOut = false;
+    var wasProg = !!runProg;
+    runProg = null; lastStep = -1;
     var ctx = A.ctx, s = S, ns = noiseSrc;
     S = null; noiseSrc = null;
     var now = ctx.currentTime;
@@ -755,26 +907,36 @@ var OggOpus = (function () {
     unlockScreen();
     stopHead();
     $('toggle').textContent = 'Lancer';
-    setStatus(finished === true ? 'Séance terminée.' : 'Arrêté.');
+    setStatus(finished === true ? (wasProg ? 'Programme terminé.' : 'Séance terminée.') : 'Arrêté.');
+    updateProgLock(); markStep(-1);
     refresh();
   }
 
+  function remainSec() {
+    if (runProg) return progTotal(runProg) - (A.ctx.currentTime - ctxT0);
+    return endAt ? (endAt - Date.now()) / 1000 : Infinity;
+  }
   function onTick() {
     if (!playing) return;
-    if (state.rampOn) {
+    if (runProg) {
+      var pn = progNow();
+      updateReadout();
+      if (pn.i !== lastStep) { lastStep = pn.i; markStep(pn.i); scheduleDraw(); }
+      else if (Date.now() - lastDraw > 1500) scheduleDraw();
+    } else if (state.rampOn) {
       applyBeat(); updateReadout();
       if (Date.now() - lastDraw > 1500) scheduleDraw();
     }
     updateStatus();
-    if (endAt) {
-      var remain = endAt - Date.now();
-      if (remain <= FADE_OUT * 1000 && remain > 0 && !fadingOut) {
+    var remain = remainSec();
+    if (remain !== Infinity) {
+      if (remain <= FADE_OUT && remain > 0 && !fadingOut) {
         fadingOut = true;
         var now = A.ctx.currentTime;
         A.sess.gain.cancelScheduledValues(now);
         A.sess.gain.setValueAtTime(A.sess.gain.value, now);
-        A.sess.gain.linearRampToValueAtTime(0, now + Math.max(0.2, remain / 1000));
-        fadeBg(0, Math.max(0.2, remain / 1000));
+        A.sess.gain.linearRampToValueAtTime(0, now + Math.max(0.2, remain));
+        fadeBg(0, Math.max(0.2, remain));
       }
       if (remain <= 0) stop(true);
     }
@@ -782,10 +944,18 @@ var OggOpus = (function () {
 
   function updateStatus() {
     if (!playing) return;
-    var parts = ['En cours'];
-    if (state.rampOn) parts.push(fmtBeat(beatNow()) + ' Hz');
-    if (endAt) {
-      var left = Math.max(0, Math.round((endAt - Date.now()) / 1000));
+    var parts = [];
+    if (runProg) {
+      var pn = progNow();
+      parts.push('Étape ' + (pn.i + 1) + '/' + runProg.length);
+      parts.push(fmtBeat(pn.b) + ' Hz');
+    } else {
+      parts.push('En cours');
+      if (state.rampOn) parts.push(fmtBeat(beatNow()) + ' Hz');
+    }
+    var rem = remainSec();
+    if (rem !== Infinity) {
+      var left = Math.max(0, Math.round(rem));
       var m = Math.floor(left / 60), s = left % 60;
       parts.push('reste ' + m + ':' + (s < 10 ? '0' : '') + s);
     }
@@ -812,11 +982,21 @@ var OggOpus = (function () {
     $('scopeInfo').textContent = fmtBeat(beatNow()) + ' par seconde';
   }
 
+  function fmtDur(min) {
+    var s = Math.round(min * 60), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    if (h) return h + ' h ' + (m < 10 ? '0' : '') + m + ' min';
+    if (m) return m + ' min' + (sec ? ' ' + sec + ' s' : '');
+    return sec + ' s';
+  }
   function mixSummary() {
     var p = [];
     p.push(state.mode === 'bin' ? 'Binaural' : state.mode === 'iso' ? 'Isochrone' : 'Binaural + isochrone');
-    p.push(fmtBeat(state.beat) + ' Hz' + (state.rampOn ? ' vers ' + fmtBeat(state.rampTo) + ' Hz en ' + state.rampMin + ' min' : ''));
-    p.push('porteuse ' + state.carrier + ' Hz');
+    if (progActive()) {
+      p.push('programme de ' + state.prog.length + ' étape' + (state.prog.length > 1 ? 's' : '') + ' (' + fmtDur(progTotal(state.prog) / 60) + ')');
+    } else {
+      p.push(fmtBeat(state.beat) + ' Hz' + (state.rampOn ? ' vers ' + fmtBeat(state.rampTo) + ' Hz en ' + state.rampMin + ' min' : ''));
+      p.push('porteuse ' + state.carrier + ' Hz');
+    }
     if (tracks.length) p.push('musique : ' + tracks.length + ' fichier' + (tracks.length > 1 ? 's' : ''));
     else p.push('sans musique');
     if (state.noise !== 'none') p.push('bruit ' + NOISE_FR[state.noise]);
@@ -827,6 +1007,10 @@ var OggOpus = (function () {
     if (state.expFmt === 'opus' && !opusOK) state.expFmt = 'wav';
     state.expMin = clamp(state.expMin, 0.1, maxExp());
     $('expSummary').textContent = mixSummary();
+    var pa = progActive(), effMin = pa ? progTotal(state.prog) / 60 : state.expMin;
+    $('expDurCtl').hidden = pa;
+    $('expProgNote').hidden = !pa;
+    if (pa) $('expProgNote').textContent = 'Le fichier contiendra tout le programme : ' + fmtDur(effMin) + ' (' + state.prog.length + ' étape' + (state.prog.length > 1 ? 's' : '') + ').';
     if (document.activeElement !== $('expMin')) $('expMin').value = String(Math.round(state.expMin * 100) / 100);
     $('expMin').max = maxExp();
     var chips = document.querySelectorAll('#expDur .chip');
@@ -834,9 +1018,10 @@ var OggOpus = (function () {
     pressGroup('expFmt', 'fmt', state.expFmt);
     var optOpus = document.querySelector('#expFmt [data-fmt="opus"]');
     optOpus.hidden = !opusOK;
-    var mb = state.expFmt === 'opus' ? state.expMin * 0.96 : state.expMin * 10.58;
+    var mb = state.expFmt === 'opus' ? effMin * 0.96 : effMin * 10.58;
     var size = mb >= 1000 ? (mb / 1000).toFixed(1) + ' Go' : (mb >= 10 ? Math.round(mb) : (Math.round(mb * 10) / 10)) + ' Mo';
     $('expSize').textContent = 'Taille estimée : ' + size + (state.expFmt === 'wav' ? '. WAV limité à 30 min.' : '. Fichier .ogg lisible sur Android et dans Chrome.');
+    if (pa && effMin > maxExp()) $('expSize').textContent += ' Ce programme est trop long pour ce format : ' + (state.expFmt === 'wav' ? 'choisis Opus.' : 'raccourcis-le (180 min maximum).');
     if (!opusOK) $('expSize').textContent += ' L\'export compressé n\'est pas disponible sur ce navigateur.';
   }
 
@@ -865,6 +1050,11 @@ var OggOpus = (function () {
     if (document.activeElement !== $('rampTo')) $('rampTo').value = state.rampTo;
     if (document.activeElement !== $('rampMin')) $('rampMin').value = state.rampMin;
     $('rampBox').hidden = !state.rampOn;
+    $('progBanner').hidden = !state.progOn;
+    $('seanceNote').hidden = !state.progOn;
+    pressGroup('progOnWrap', 'on', state.progOn ? 1 : 0);
+    pressGroup('progGlide', 'g', state.glide);
+    updateProgSummary();
     $('rampInfo').hidden = !state.rampOn;
     $('rampInfo').textContent = 'De ' + fmtBeat(state.beat) + ' Hz à ' + fmtBeat(state.rampTo) + ' Hz en ' + state.rampMin + ' min.';
     var pre = document.querySelectorAll('#presets .chip');
@@ -886,7 +1076,7 @@ var OggOpus = (function () {
 
   /* onglets */
   var tabEls = document.querySelectorAll('.tab');
-  var panelIds = ['son', 'fond', 'seance', 'export'];
+  var panelIds = ['son', 'fond', 'seance', 'prog', 'export'];
   function showTab(name) {
     for (var i = 0; i < tabEls.length; i++) {
       var on = tabEls[i].dataset.tab === name;
@@ -937,7 +1127,7 @@ var OggOpus = (function () {
   $('timers').addEventListener('click', function (e) {
     var b = e.target.closest('[data-min]'); if (!b) return;
     state.timer = parseInt(b.dataset.min, 10);
-    if (playing) { endAt = state.timer > 0 ? Date.now() + state.timer * 60000 : 0; fadingOut = false; }
+    if (playing && !runProg) { endAt = state.timer > 0 ? Date.now() + state.timer * 60000 : 0; fadingOut = false; }
     refresh(); updateStatus();
   });
   $('rampOnWrap').addEventListener('click', function (e) {
@@ -957,9 +1147,116 @@ var OggOpus = (function () {
     var b = e.target.closest('[data-s]'); if (!b) return;
     var s = SCEN[b.dataset.s]; if (!s) return;
     for (var key in s) state[key] = s[key];
+    state.progOn = false;
     restartRamp();
-    if (playing) { endAt = state.timer > 0 ? Date.now() + state.timer * 60000 : 0; fadingOut = false; }
+    if (playing && !runProg) { endAt = state.timer > 0 ? Date.now() + state.timer * 60000 : 0; fadingOut = false; }
     refresh(); applyNoise(); updateStatus();
+  });
+
+  /* ---------- Programme : saisie des étapes ---------- */
+  var MAX_STEPS = 30;
+  var TPL = {
+    down: [{ c: 256, b: 10, m: 10 }, { c: 256, b: 6, m: 15 }, { c: 200, b: 2, m: 20 }],
+    up: [{ c: 200, b: 2, m: 5 }, { c: 256, b: 6, m: 5 }, { c: 256, b: 10, m: 5 }, { c: 256, b: 15, m: 5 }]
+  };
+  function band(b) { return b < 4 ? 'delta' : b < 8 ? 'thêta' : b < 13 ? 'alpha' : b < 30 ? 'bêta' : 'gamma'; }
+  function updateProgLock() { $('progEdit').disabled = !!(playing && runProg); }
+  function updateProgSummary() {
+    var n = state.prog.length;
+    $('progEmpty').hidden = n > 0;
+    $('progAdd').hidden = n >= MAX_STEPS;
+    $('progTotal').textContent = n ? fmtDur(progTotal(state.prog) / 60) + ' · ' + n + ' étape' + (n > 1 ? 's' : '') : 'Aucune étape';
+  }
+  function markStep(i) {
+    var els = $('progList').children;
+    for (var k = 0; k < els.length; k++) {
+      if (k === i) els[k].setAttribute('aria-current', 'true'); else els[k].removeAttribute('aria-current');
+    }
+  }
+  function stepNode(s, i, n) {
+    var li = document.createElement('li');
+    li.className = 'step';
+    var top = document.createElement('div'); top.className = 'step-top';
+    var lab = document.createElement('span'); lab.className = 'label'; lab.textContent = 'Étape ' + (i + 1);
+    var act = document.createElement('span'); act.className = 'step-act';
+    [['up', '↑', 'Monter l\'étape ' + (i + 1), i === 0],
+     ['down', '↓', 'Descendre l\'étape ' + (i + 1), i === n - 1],
+     ['del', '×', 'Supprimer l\'étape ' + (i + 1), false]].forEach(function (d) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'sbtn'; b.dataset.act = d[0]; b.textContent = d[1];
+      b.setAttribute('aria-label', d[2]); b.disabled = d[3];
+      act.appendChild(b);
+    });
+    top.appendChild(lab); top.appendChild(act);
+    var grid = document.createElement('div'); grid.className = 'step-grid';
+    [['c', 'Porteuse', 60, 1000, '1', s.c, 'Hz'],
+     ['b', 'Battement', 0.5, 40, '0.1', s.b, band(s.b)],
+     ['m', 'Durée', 0.1, 240, 'any', s.m, 'min']].forEach(function (f) {
+      var l = document.createElement('label'); l.className = 'sf';
+      var sp = document.createElement('span'); sp.textContent = f[1];
+      var inp = document.createElement('input');
+      inp.type = 'number'; inp.inputMode = 'decimal'; inp.min = f[2]; inp.max = f[3]; inp.step = f[4];
+      inp.value = String(f[5]); inp.dataset.f = f[0];
+      var sm = document.createElement('small'); sm.textContent = f[6]; if (f[0] === 'b') sm.className = 'bandname';
+      l.appendChild(sp); l.appendChild(inp); l.appendChild(sm);
+      grid.appendChild(l);
+    });
+    li.appendChild(top); li.appendChild(grid);
+    return li;
+  }
+  function renderProg() {
+    var ul = $('progList');
+    while (ul.firstChild) ul.removeChild(ul.firstChild);
+    var n = state.prog.length;
+    state.prog.forEach(function (s, i) { ul.appendChild(stepNode(s, i, n)); });
+    updateProgSummary();
+    updateExportUI();
+  }
+  function progChanged() { save(); refresh(); }
+  function addSteps(list) {
+    for (var i = 0; i < list.length && state.prog.length < MAX_STEPS; i++) state.prog.push({ c: list[i].c, b: list[i].b, m: list[i].m });
+    renderProg(); progChanged();
+  }
+  $('progAdd').addEventListener('click', function () {
+    var last = state.prog[state.prog.length - 1];
+    addSteps([last || { c: state.carrier, b: state.beat, m: 10 }]);
+    var items = $('progList').children;
+    if (items.length) items[items.length - 1].scrollIntoView({ block: 'nearest' });
+  });
+  $('progTpl').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-t]'); if (b && TPL[b.dataset.t]) addSteps(TPL[b.dataset.t]);
+  });
+  $('progList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var li = b.closest('.step'), i = Array.prototype.indexOf.call($('progList').children, li);
+    if (i < 0) return;
+    var a = b.dataset.act, p = state.prog;
+    if (a === 'del') p.splice(i, 1);
+    else if (a === 'up' && i > 0) { var t = p[i - 1]; p[i - 1] = p[i]; p[i] = t; }
+    else if (a === 'down' && i < p.length - 1) { var t2 = p[i + 1]; p[i + 1] = p[i]; p[i] = t2; }
+    renderProg(); progChanged();
+  });
+  $('progList').addEventListener('change', function (e) {
+    var inp = e.target.closest('input[data-f]'); if (!inp) return;
+    var li = inp.closest('.step'), i = Array.prototype.indexOf.call($('progList').children, li);
+    if (i < 0 || !state.prog[i]) return;
+    var v = parseFloat(inp.value), f = inp.dataset.f, s = state.prog[i];
+    if (isNaN(v)) { inp.value = String(s[f]); return; }
+    if (f === 'c') s.c = clamp(Math.round(v), 60, 1000);
+    else if (f === 'b') s.b = clamp(r1(v), 0.5, 40);
+    else s.m = clamp(Math.round(v * 10) / 10, 0.1, 240);
+    inp.value = String(s[f]);
+    if (f === 'b') { var bn = li.querySelector('.bandname'); if (bn) bn.textContent = band(s.b); }
+    updateProgSummary(); progChanged();
+  });
+  $('progOnWrap').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-on]'); if (!b) return;
+    state.progOn = b.dataset.on === '1'; refresh();
+  });
+  $('progOffBtn').addEventListener('click', function () { state.progOn = false; refresh(); });
+  $('progGlide').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-g]'); if (!b) return;
+    state.glide = parseInt(b.dataset.g, 10); refresh();
   });
 
   /* ---------- Fichiers audio (conservés dans IndexedDB) ---------- */
@@ -1188,7 +1485,14 @@ var OggOpus = (function () {
     if (expRunning) return;
     var fmt = state.expFmt === 'opus' && opusOK ? 'opus' : 'wav';
     var SR = fmt === 'opus' ? 48000 : 44100;
-    var minutes = clamp(state.expMin, 0.1, fmt === 'wav' ? 30 : 180);
+    var prog = progActive() ? state.prog.map(function (s) { return { c: s.c, b: s.b, m: s.m }; }) : null;
+    var glide = state.glide;
+    var minutes = prog ? progTotal(prog) / 60 : clamp(state.expMin, 0.1, fmt === 'wav' ? 30 : 180);
+    var limit = fmt === 'wav' ? 30 : 180;
+    if (minutes > limit + 0.001) {
+      setExpMsg('Ce programme dure ' + fmtDur(minutes) + ', c\'est trop long pour ce format' + (fmt === 'wav' ? ' (30 min maximum). Choisis Opus.' : ' (180 min maximum).'));
+      return;
+    }
     var T = minutes * 60, total = Math.round(T * SR);
     expRunning = true; expCancel = false;
     if (playing) stop();
@@ -1215,6 +1519,11 @@ var OggOpus = (function () {
       var phL = 0, phR = 0, lfo = 0;
       var startBeat = state.beat;
       var fo = Math.min(FADE_OUT, T / 2), fi = Math.min(FADE_IN, T / 2);
+      var rampOn = state.rampOn, rampTo = state.rampTo, rampSec = state.rampMin * 60, carrier = state.carrier;
+      function paramsAt(t) {
+        if (prog) { var p = progAt(t, prog, glide); return { b: p.b, c: p.c }; }
+        return { b: rampOn ? startBeat + (rampTo - startBeat) * clamp(t / rampSec, 0, 1) : startBeat, c: carrier };
+      }
 
       var oL = new Float32Array(BLOCK), oR = new Float32Array(BLOCK);
       var mL = new Float32Array(BLOCK), mR = new Float32Array(BLOCK);
@@ -1225,17 +1534,19 @@ var OggOpus = (function () {
       for (var n0 = 0; n0 < total; n0 += BLOCK) {
         if (expCancel) throw new Error('cancel');
         var len = Math.min(BLOCK, total - n0);
-        var tMid = (n0 + len / 2) / SR;
-        var b = state.rampOn ? startBeat + (state.rampTo - startBeat) * clamp(tMid / (state.rampMin * 60), 0, 1) : startBeat;
-        var f = freqs(b);
-        var dL = TWO_PI * f[0] / SR, dR = TWO_PI * f[1] / SR, dB = TWO_PI * b / SR;
+        var P0 = paramsAt(n0 / SR), P1 = paramsAt((n0 + len) / SR);
+        var F0 = freqs(P0.b, P0.c), F1 = freqs(P1.b, P1.c);
+        var dL0 = TWO_PI * F0[0] / SR, dL1 = TWO_PI * F1[0] / SR;
+        var dR0 = TWO_PI * F0[1] / SR, dR1 = TWO_PI * F1[1] / SR;
+        var dB0 = TWO_PI * P0.b / SR, dB1 = TWO_PI * P1.b / SR;
         if (music) await music.fill(mL, mR, len); else { mL.fill(0, 0, len); mR.fill(0, 0, len); }
 
         for (var i = 0; i < len; i++) {
-          phL += dL; if (phL >= TWO_PI) phL -= TWO_PI;
-          phR += dR; if (phR >= TWO_PI) phR -= TWO_PI;
+          var u = i / len;
+          phL += dL0 + (dL1 - dL0) * u; if (phL >= TWO_PI) phL -= TWO_PI;
+          phR += dR0 + (dR1 - dR0) * u; if (phR >= TWO_PI) phR -= TWO_PI;
           var env = 1;
-          if (pOn) { lfo += dB; if (lfo >= TWO_PI) lfo -= TWO_PI; env = lut[(lfo * LUTK) | 0]; }
+          if (pOn) { lfo += dB0 + (dB1 - dB0) * u; if (lfo >= TWO_PI) lfo -= TWO_PI; env = lut[(lfo * LUTK) | 0]; }
           var t = (n0 + i) / SR;
           var master = (t < fi ? t / fi : 1) * (T - t < fo ? (T - t) / fo : 1);
           var tone = env * toneA;
@@ -1269,7 +1580,11 @@ var OggOpus = (function () {
         if (acc.length) parts.push(new Blob(acc));
         blob = new Blob([wavHeader(total, SR)].concat(parts), { type: 'audio/wav' }); ext = 'wav'; mime = 'audio/wav';
       }
-      var base = 'binaural-' + (state.mode === 'bin' ? 'bin' : state.mode === 'iso' ? 'iso' : 'bin-iso') + '-' + String(r1(state.beat)).replace('.', 'p') + 'Hz' + (state.rampOn ? '-vers-' + String(r1(state.rampTo)).replace('.', 'p') + 'Hz' : '') + '-' + String(Math.round(minutes * 10) / 10).replace('.', 'p') + 'min';
+      var modeTag = state.mode === 'bin' ? 'bin' : state.mode === 'iso' ? 'iso' : 'bin-iso';
+      var durTag = String(Math.round(minutes * 10) / 10).replace('.', 'p') + 'min';
+      var base = prog
+        ? 'binaural-programme-' + prog.length + 'etapes-' + modeTag + '-' + durTag
+        : 'binaural-' + modeTag + '-' + String(r1(state.beat)).replace('.', 'p') + 'Hz' + (state.rampOn ? '-vers-' + String(r1(state.rampTo)).replace('.', 'p') + 'Hz' : '') + '-' + durTag;
       var name = base + '.' + ext;
       expUrl = URL.createObjectURL(blob);
       $('expAudio').src = expUrl;
@@ -1330,6 +1645,7 @@ var OggOpus = (function () {
 
   /* ---------- Démarrage ---------- */
   renderTracks();
+  renderProg();
   showTab('son');
   syncUI();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleDraw);
